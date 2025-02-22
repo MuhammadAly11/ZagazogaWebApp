@@ -1,5 +1,5 @@
-export interface ModuleMetadata {
-  type: 'module';
+export interface LessonMetadata {
+  type: 'lesson';
   module: string;
   subject: string;
   lesson: string;
@@ -12,7 +12,7 @@ export interface CustomMetadata {
   tags: string[];
 }
 
-export type QuizMetadata = ModuleMetadata | CustomMetadata;
+export type QuizMetadata = LessonMetadata | CustomMetadata;
 
 export interface QuizQuestion {
   sn: string;

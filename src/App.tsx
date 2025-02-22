@@ -17,23 +17,23 @@ import {
   Layout,
   ListChecks
 } from 'lucide-react';
-import type { QuizMetadata, ModuleMetadata, CustomMetadata, QuizQuestion, Option } from './types';
+import type { QuizMetadata, CustomMetadata, QuizQuestion, Option, LessonMetadata } from './types';
 
 const DEFAULT_OPTIONS: Option[] = ['a', 'b', 'c', 'd'];
 const EXTRA_OPTIONS: Option[] = ['e', 'f', 'g'];
 
-const INITIAL_MODULE_METADATA: ModuleMetadata = {
-  type: 'module',
+const INITIAL_LESSON_METADATA: LessonMetadata = {
+  type: 'lesson',
   module: '',
   subject: '',
-  lesson: '',
+  lesson: ''
 };
 
 const INITIAL_CUSTOM_METADATA: CustomMetadata = {
   type: 'custom',
   module: '',
   title: '',
-  tags: [],
+  tags: []
 };
 
 const INITIAL_QUESTION: QuizQuestion = {
@@ -51,25 +51,25 @@ const INITIAL_QUESTION: QuizQuestion = {
 };
 
 function App() {
-  const [metadata, setMetadata] = useState<QuizMetadata>(INITIAL_MODULE_METADATA);
+  const [metadata, setMetadata] = useState<QuizMetadata>(INITIAL_LESSON_METADATA);
   const [questions, setQuestions] = useState<QuizQuestion[]>([{ ...INITIAL_QUESTION }]);
   const [extraOptionsCount, setExtraOptionsCount] = useState<{ [key: string]: number }>({});
   const [showHelp, setShowHelp] = useState(false);
 
   const toggleMetadataType = () => {
     setMetadata((prev: QuizMetadata): QuizMetadata => {
-      if (prev.type === 'module') {
+      if (prev.type === 'lesson') {
         return INITIAL_CUSTOM_METADATA;
       }
-      return INITIAL_MODULE_METADATA;
+      return INITIAL_LESSON_METADATA;
     });
   };
 
-  const updateModuleMetadata = (updates: Partial<ModuleMetadata>) => {
+  const updateLessonMetadata = (updates: Partial<LessonMetadata>) => {
     setMetadata(prev => ({
       ...prev,
       ...updates,
-    } as ModuleMetadata));
+    } as LessonMetadata));
   };
 
   const updateCustomMetadata = (updates: Partial<CustomMetadata>) => {
@@ -98,7 +98,7 @@ function App() {
   };
 
   const isMetadataValid = () => {
-    if (metadata.type === 'module') {
+    if (metadata.type === 'lesson') {
       return metadata.module.trim() !== '' &&
              metadata.subject.trim() !== '' &&
              metadata.lesson.trim() !== '';
@@ -328,8 +328,8 @@ function App() {
                         <li className="flex items-center space-x-2 text-amber-600">
                           <AlertCircle className="w-4 h-4 flex-shrink-0" />
                           <span>
-                            {metadata.type === 'module'
-                              ? 'Fill in all module details (module, subject, lesson)'
+                            {metadata.type === 'lesson'
+                              ? 'Fill in all lesson details (module, subject, lesson)'
                               : 'Fill in the quiz title'}
                           </span>
                         </li>
@@ -362,7 +362,7 @@ function App() {
                 className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
               >
                 <SwitchCamera className="w-4 h-4" />
-                <span>Switch to {metadata.type === 'module' ? 'Custom' : 'Module'}</span>
+                <span>Switch to {metadata.type === 'lesson' ? 'Custom Mode' : 'Lesson Mode'}</span>
               </button>
             </div>
 
@@ -370,21 +370,21 @@ function App() {
               <div className="mb-6 flex items-start space-x-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <p className="text-sm">
-                  {metadata.type === 'module'
-                    ? 'Please fill in all required fields: module, subject, and lesson.'
+                  {metadata.type === 'lesson'
+                    ? 'Please fill in all lesson details: module, subject, and lesson.'
                     : 'Please fill in the quiz title.'}
                 </p>
               </div>
             )}
 
-            {metadata.type === 'module' ? (
+            {metadata.type === 'lesson' ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Module</label>
                   <input
                     type="text"
                     value={metadata.module}
-                    onChange={(e) => updateModuleMetadata({ module: e.target.value })}
+                    onChange={(e) => updateLessonMetadata({ module: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Enter module name"
                   />
@@ -394,7 +394,7 @@ function App() {
                   <input
                     type="text"
                     value={metadata.subject}
-                    onChange={(e) => updateModuleMetadata({ subject: e.target.value })}
+                    onChange={(e) => updateLessonMetadata({ subject: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Enter subject"
                   />
@@ -404,7 +404,7 @@ function App() {
                   <input
                     type="text"
                     value={metadata.lesson}
-                    onChange={(e) => updateModuleMetadata({ lesson: e.target.value })}
+                    onChange={(e) => updateLessonMetadata({ lesson: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Enter lesson"
                   />
@@ -650,7 +650,7 @@ function App() {
               <div className="prose prose-indigo max-w-none">
                 <h3>Creating a Quiz</h3>
                 <p>
-                  Start by selecting either Module or Custom quiz type. Fill in all required metadata
+                  Start by selecting either Lesson or Custom quiz type. Fill in all required metadata
                   fields for your quiz.
                 </p>
                 <h3>Adding Questions</h3>
