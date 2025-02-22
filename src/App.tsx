@@ -115,9 +115,35 @@ function App() {
     ));
   };
 
+  const getFilledOptionsCount = (question: QuizQuestion) => {
+    // Check options in sequence until we find an empty one
+    for (let i = 0; i < DEFAULT_OPTIONS.length + EXTRA_OPTIONS.length; i++) {
+      const opt = [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS][i];
+      if (!question[opt] || question[opt].trim() === '') {
+        return i;
+      }
+    }
+    return DEFAULT_OPTIONS.length + EXTRA_OPTIONS.length;
+  };
+
+  const areOptionsFilledInSequence = (question: QuizQuestion, availableOptions: Option[]) => {
+    for (let i = 0; i < availableOptions.length - 1; i++) {
+      const currentOpt = availableOptions[i];
+      if (!question[currentOpt] || question[currentOpt].trim() === '') {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const addExtraOption = (index: number) => {
     const currentCount = extraOptionsCount[index] || 0;
-    if (currentCount < EXTRA_OPTIONS.length) {
+    const availableOptions = getAvailableOptions(index);
+    
+    // Check if all existing options have content in sequence
+    const optionsInSequence = areOptionsFilledInSequence(questions[index], availableOptions);
+    
+    if (currentCount < EXTRA_OPTIONS.length && optionsInSequence) {
       setExtraOptionsCount(prev => ({
         ...prev,
         [index]: currentCount + 1
@@ -130,18 +156,37 @@ function App() {
     return [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS.slice(0, extraCount)];
   };
 
-  const getFilledOptionsCount = (question: QuizQuestion) => {
-    return [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS].filter(opt => question[opt].trim() !== '').length;
-  };
-
   const isQuestionValid = (question: QuizQuestion) => {
     const hasQuestion = question.question.trim() !== '';
     const hasSource = question.source.trim() !== '';
-    const hasEnoughOptions = getFilledOptionsCount(question) >= 2;
-    const hasAnswer = question.answer !== '';
-    const isAnswerValid = hasAnswer && (question.answer ? (question as any)[question.answer].trim() !== '' : false);
     
-    return hasQuestion && hasSource && hasEnoughOptions && hasAnswer && isAnswerValid;
+    // Check if options are filled in sequence
+    let optionsInSequence = true;
+    let filledCount = 0;
+    const allOptions = [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS];
+    
+    for (let i = 0; i < allOptions.length; i++) {
+      const opt = allOptions[i];
+      const value = question[opt].trim();
+      
+      if (value === '') {
+        // If we find an empty option, all following options must be empty
+        for (let j = i + 1; j < allOptions.length; j++) {
+          if (question[allOptions[j]].trim() !== '') {
+            optionsInSequence = false;
+            break;
+          }
+        }
+        break;
+      }
+      filledCount++;
+    }
+    
+    const hasEnoughOptions = filledCount >= 2;
+    const hasAnswer = question.answer !== '';
+    const isAnswerValid = hasAnswer && question[question.answer].trim() !== '';
+    
+    return hasQuestion && hasSource && hasEnoughOptions && hasAnswer && isAnswerValid && optionsInSequence;
   };
 
   const getQuestionValidationMessage = (question: QuizQuestion) => {
@@ -149,9 +194,27 @@ function App() {
     
     if (!question.question.trim()) missing.push('question text');
     if (!question.source.trim()) missing.push('source');
-    if (getFilledOptionsCount(question) < 2) missing.push('at least 2 options');
+    
+    // Check options sequence
+    let hasSequenceError = false;
+    const allOptions = [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS];
+    for (let i = 0; i < allOptions.length - 1; i++) {
+      const currentOpt = allOptions[i];
+      const nextOpt = allOptions[i + 1];
+      if (question[currentOpt].trim() === '' && question[nextOpt].trim() !== '') {
+        hasSequenceError = true;
+        break;
+      }
+    }
+    
+    if (hasSequenceError) {
+      missing.push('options must be filled in sequence (no gaps allowed)');
+    } else if (getFilledOptionsCount(question) < 2) {
+      missing.push('at least 2 options');
+    }
+    
     if (!question.answer) missing.push('correct answer selection');
-    else if (question.answer && (question as any)[question.answer].trim() === '') missing.push('content for the selected correct answer');
+    else if (question.answer && question[question.answer].trim() === '') missing.push('content for the selected correct answer');
     
     return `Please ensure you have filled in: ${missing.join(', ')}.`;
   };
@@ -604,13 +667,13 @@ function App() {
               <div className="flex justify-end">
                 <button
                   onClick={() => addExtraOption(index)}
-                  disabled={(extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length}
+                  disabled={(extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(question, getAvailableOptions(index))}
                   className={`btn-secondary flex items-center gap-2 ${
-                    (extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length ? 'opacity-50 cursor-not-allowed' : ''
+                    ((extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(question, getAvailableOptions(index))) ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <PlusCircle size={20} />
-                  Add Option
+                  {areOptionsFilledInSequence(question, getAvailableOptions(index)) ? 'Add Option' : 'Fill options in sequence'}
                 </button>
               </div>
             </div>

@@ -26,6 +26,7 @@ export interface QuizQuestion {
   e: string;
   f: string;
   g: string;
+  [key: string]: string;
 }
 
 export type Option = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g';
