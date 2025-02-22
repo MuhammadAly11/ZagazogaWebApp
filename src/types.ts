@@ -1,3 +1,9 @@
+export interface QuizMetadata {
+  module: string;
+  subject: string;
+  lesson: string;
+}
+
 export interface QuizQuestion {
   sn: string;
   source: string;

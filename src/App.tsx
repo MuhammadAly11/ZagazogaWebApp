@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { PlusCircle, Download, Trash2, AlertCircle, BookOpen, HelpCircle, Plus, X, ChevronRight, FileQuestion, Settings } from 'lucide-react';
-import type { QuizQuestion, Option } from './types';
+import { AlertCircle, PlusCircle, Trash2, HelpCircle, X, ChevronRight, FileQuestion, Settings, Download } from 'lucide-react';
+import type { QuizMetadata, QuizQuestion, Option } from './types';
 
 const DEFAULT_OPTIONS: Option[] = ['a', 'b', 'c', 'd'];
 const EXTRA_OPTIONS: Option[] = ['e', 'f', 'g'];
+
+const INITIAL_METADATA: QuizMetadata = {
+  module: '',
+  subject: '',
+  lesson: '',
+};
 
 const INITIAL_QUESTION: QuizQuestion = {
   sn: '1',
@@ -20,9 +26,20 @@ const INITIAL_QUESTION: QuizQuestion = {
 };
 
 function App() {
+  const [metadata, setMetadata] = useState<QuizMetadata>(INITIAL_METADATA);
   const [questions, setQuestions] = useState<QuizQuestion[]>([{ ...INITIAL_QUESTION }]);
-  const [showHelp, setShowHelp] = useState(false);
   const [extraOptionsCount, setExtraOptionsCount] = useState<{ [key: string]: number }>({});
+  const [showHelp, setShowHelp] = useState(false);
+
+  const updateMetadata = (updates: Partial<QuizMetadata>) => {
+    setMetadata(prev => ({ ...prev, ...updates }));
+  };
+
+  const isMetadataValid = () => {
+    return metadata.module.trim() !== '' &&
+           metadata.subject.trim() !== '' &&
+           metadata.lesson.trim() !== '';
+  };
 
   const addQuestion = () => {
     setQuestions(prev => [
@@ -38,12 +55,6 @@ function App() {
     setQuestions(prev => {
       const newQuestions = prev.filter((_, i) => i !== index);
       return newQuestions.map((q, i) => ({ ...q, sn: String(i + 1) }));
-    });
-    // Also remove from extra options tracking
-    setExtraOptionsCount(prev => {
-      const newCounts = { ...prev };
-      delete newCounts[index];
-      return newCounts;
     });
   };
 
@@ -68,8 +79,37 @@ function App() {
     return [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS.slice(0, extraCount)];
   };
 
+  const getFilledOptionsCount = (question: QuizQuestion) => {
+    return [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS].filter(opt => question[opt].trim() !== '').length;
+  };
+
+  const isQuestionValid = (question: QuizQuestion) => {
+    const hasQuestion = question.question.trim() !== '';
+    const hasSource = question.source.trim() !== '';
+    const hasEnoughOptions = getFilledOptionsCount(question) >= 2;
+    const hasAnswer = question.answer !== '';
+    
+    return hasQuestion && hasSource && hasEnoughOptions && hasAnswer;
+  };
+
+  const getQuestionValidationMessage = (question: QuizQuestion) => {
+    const missing = [];
+    
+    if (!question.question.trim()) missing.push('question text');
+    if (!question.source.trim()) missing.push('source');
+    if (getFilledOptionsCount(question) < 2) missing.push('at least 2 options');
+    if (!question.answer) missing.push('correct answer selection');
+    
+    return `Please ensure you have filled in: ${missing.join(', ')}.`;
+  };
+
+  const areAllQuestionsValid = questions.every(isQuestionValid) && isMetadataValid();
+
   const downloadJSON = () => {
-    const dataStr = JSON.stringify(questions, null, 2);
+    const dataStr = JSON.stringify({
+      ...metadata,
+      questions
+    }, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -81,30 +121,14 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
-  const getFilledOptionsCount = (question: QuizQuestion) => {
-    return [...DEFAULT_OPTIONS, ...EXTRA_OPTIONS].filter(opt => question[opt].trim() !== '').length;
-  };
-
-  const isQuestionValid = (question: QuizQuestion) => {
-    return question.question.trim() !== '' && 
-           question.source.trim() !== '' && 
-           getFilledOptionsCount(question) >= 2;
-  };
-
-  const areAllQuestionsValid = questions.every(isQuestionValid);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8 animate-gradient-x">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-10">
-          <div className="flex items-center gap-4 group">
-            <div className="p-3 bg-white rounded-2xl shadow-md group-hover:shadow-lg transition-all duration-300">
-              <BookOpen className="text-indigo-600 group-hover:text-indigo-700 transition-colors" size={36} />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Quiz Question Editor
-            </h1>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold text-indigo-600">
+            Quiz Question Editor
+          </h1>
+          
           <div className="flex gap-4">
             <button
               onClick={() => setShowHelp(prev => !prev)}
@@ -170,8 +194,17 @@ function App() {
                             <ChevronRight size={12} className="text-indigo-600" />
                           </div>
                           <div>
-                            <span className="font-medium text-gray-900">Source & Text</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Enter the subject area and write your question clearly</p>
+                            <span className="font-medium text-gray-900">Quiz Details</span>
+                            <p className="text-sm text-gray-600 mt-0.5">Fill in the module, subject, and lesson information</p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
+                          <div className="p-1.5 bg-indigo-100 rounded-full mt-0.5">
+                            <ChevronRight size={12} className="text-indigo-600" />
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-900">Question Content</span>
+                            <p className="text-sm text-gray-600 mt-0.5">Write your question and specify its source</p>
                           </div>
                         </li>
                         <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
@@ -181,15 +214,6 @@ function App() {
                           <div>
                             <span className="font-medium text-gray-900">Answer Options</span>
                             <p className="text-sm text-gray-600 mt-0.5">Add at least 2 options and mark the correct one</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-indigo-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-indigo-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Validation</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Questions are validated automatically as you type</p>
                           </div>
                         </li>
                       </ul>
@@ -217,8 +241,8 @@ function App() {
                             <ChevronRight size={12} className="text-purple-600" />
                           </div>
                           <div>
-                            <span className="font-medium text-gray-900">Question Management</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Add, remove, or navigate between questions easily</p>
+                            <span className="font-medium text-gray-900">Validation</span>
+                            <p className="text-sm text-gray-600 mt-0.5">All required fields are checked automatically</p>
                           </div>
                         </li>
                         <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
@@ -227,7 +251,7 @@ function App() {
                           </div>
                           <div>
                             <span className="font-medium text-gray-900">Export</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Download your quiz as JSON when all questions are valid</p>
+                            <p className="text-sm text-gray-600 mt-0.5">Download your quiz as JSON when all fields are valid</p>
                           </div>
                         </li>
                       </ul>
@@ -249,27 +273,100 @@ function App() {
           </div>
         )}
 
-        <div className="space-y-8">
-          {questions.map((question, index) => (
-            <div 
-              key={index} 
-              className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl ${
-                isQuestionValid(question) ? 'border-transparent' : 'border-2 border-amber-200'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Question {question.sn}
-                </h2>
-                <button
-                  onClick={() => removeQuestion(index)}
-                  className={`p-2 rounded-xl hover:bg-red-50 text-red-600 hover:text-red-700 transition-all duration-300 ${
-                    questions.length === 1 ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  disabled={questions.length === 1}
-                >
-                  <Trash2 size={20} />
-                </button>
+        {/* Metadata Section */}
+        <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl ${
+          isMetadataValid() ? 'border-transparent' : 'border-2 border-amber-200'
+        }`}>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            Quiz Details
+          </h2>
+
+          <div className="grid gap-6 sm:grid-cols-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Module
+              </label>
+              <input
+                type="text"
+                value={metadata.module}
+                onChange={e => updateMetadata({ module: e.target.value })}
+                placeholder="e.g., First Year"
+                className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subject
+              </label>
+              <input
+                type="text"
+                value={metadata.subject}
+                onChange={e => updateMetadata({ subject: e.target.value })}
+                placeholder="e.g., Biology"
+                className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Lesson
+              </label>
+              <input
+                type="text"
+                value={metadata.lesson}
+                onChange={e => updateMetadata({ lesson: e.target.value })}
+                placeholder="e.g., Cell Biology"
+                className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+              />
+            </div>
+          </div>
+
+          {!isMetadataValid() && (
+            <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600">
+              <AlertCircle size={20} />
+              <p className="text-sm font-medium">
+                Please fill in the module, subject, and lesson fields.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Questions Section */}
+        {questions.map((question, index) => (
+          <div 
+            key={index}
+            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl ${
+              isQuestionValid(question) ? 'border-transparent' : 'border-2 border-amber-200'
+            }`}
+          >
+            <div className="flex justify-between items-start mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Question {question.sn}
+              </h2>
+              <button
+                onClick={() => removeQuestion(index)}
+                className={`p-2 rounded-xl hover:bg-red-50 text-red-600 hover:text-red-700 transition-all duration-300 ${
+                  questions.length === 1 ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                disabled={questions.length === 1}
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+
+            <div className="grid gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Question Text
+                </label>
+                <textarea
+                  value={question.question}
+                  onChange={e => updateQuestion(index, { question: e.target.value })}
+                  placeholder="Enter your question here..."
+                  rows={3}
+                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                />
               </div>
 
               <div className="grid gap-6 sm:grid-cols-2">
@@ -294,9 +391,8 @@ function App() {
                     value={question.answer}
                     onChange={e => updateQuestion(index, { answer: e.target.value as Option })}
                     className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
-                    required
                   >
-                    <option value="" disabled>Select correct answer</option>
+                    <option value="">Select correct answer</option>
                     {getAvailableOptions(index).map(opt => (
                       <option key={opt} value={opt}>
                         Option {opt.toUpperCase()}
@@ -304,19 +400,6 @@ function App() {
                     ))}
                   </select>
                 </div>
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Question Text
-                </label>
-                <textarea
-                  value={question.question}
-                  onChange={e => updateQuestion(index, { question: e.target.value })}
-                  placeholder="Enter your question here..."
-                  rows={3}
-                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
-                />
               </div>
 
               <div className="mt-6 grid gap-6 sm:grid-cols-2">
@@ -341,7 +424,7 @@ function App() {
                 ))}
               </div>
 
-              <div className="mt-6 flex justify-between items-center">
+              <div className="flex justify-end">
                 <button
                   onClick={() => addExtraOption(index)}
                   disabled={(extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length}
@@ -349,26 +432,27 @@ function App() {
                     (extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  <Plus size={20} />
+                  <PlusCircle size={20} />
                   Add Option
                 </button>
-
-                {!isQuestionValid(question) && (
-                  <div className="flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600">
-                    <AlertCircle size={20} />
-                    <p className="text-sm font-medium">
-                      Please ensure you have filled in the source, question text, and at least 2 options.
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
-          ))}
-        </div>
 
+            {!isQuestionValid(question) && (
+              <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600">
+                <AlertCircle size={20} />
+                <p className="text-sm font-medium">
+                  {getQuestionValidationMessage(question)}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Add Question Button */}
         <button
           onClick={addQuestion}
-          className="mt-8 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl shadow-md hover:shadow-lg active:shadow-sm transition-all duration-300"
+          className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl shadow-md hover:shadow-lg active:shadow-sm transition-all duration-300"
         >
           <PlusCircle size={20} />
           Add Question
