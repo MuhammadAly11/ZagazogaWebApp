@@ -171,17 +171,20 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-indigo-600">
-            Quiz Question Editor
-          </h1>
+        <div className="flex justify-between items-center animate-fade-in">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+              Quiz Question Editor
+            </h1>
+            <p className="mt-2 text-gray-600">Create and manage your quiz questions with ease</p>
+          </div>
           
           <div className="flex gap-4">
             <button
               onClick={() => setShowHelp(prev => !prev)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-gray-700 hover:text-indigo-600 hover:shadow-md active:shadow-sm transition-all duration-300"
+              className="btn-secondary"
             >
               <HelpCircle size={20} />
               Help
@@ -189,10 +192,8 @@ function App() {
             <button
               onClick={downloadJSON}
               disabled={!areAllQuestionsValid}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-white transition-all duration-300 ${
-                areAllQuestionsValid 
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg active:shadow-sm' 
-                  : 'bg-gray-400 cursor-not-allowed'
+              className={`btn-primary flex items-center gap-2 ${
+                !areAllQuestionsValid && 'opacity-50 cursor-not-allowed'
               }`}
             >
               <Download size={20} />
@@ -203,10 +204,10 @@ function App() {
 
         {/* Help Modal */}
         {showHelp && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setShowHelp(false)} />
+          <div className="fixed inset-0 z-50 overflow-y-auto animate-fade-in">
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" onClick={() => setShowHelp(false)} />
             <div className="relative min-h-screen flex items-center justify-center p-4">
-              <div className="relative bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-auto animate-modal">
+              <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl max-w-3xl w-full mx-auto animate-modal">
                 <div className="absolute right-4 top-4">
                   <button
                     onClick={() => setShowHelp(false)}
@@ -323,16 +324,23 @@ function App() {
         )}
 
         {/* Metadata Section */}
-        <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl ${
-          isMetadataValid() ? 'border-transparent' : 'border-2 border-amber-200'
+        <div className={`glass-card p-8 animate-slide-up ${
+          !isMetadataValid() && 'ring-2 ring-amber-200'
         }`}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Quiz Details
-            </h2>
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Quiz Details
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {metadata.type === 'module' 
+                  ? 'Organize your quiz by module, subject, and lesson'
+                  : 'Add a title and relevant tags for your quiz'}
+              </p>
+            </div>
             <button
               onClick={toggleMetadataType}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all duration-300"
+              className="btn-secondary flex items-center gap-2"
             >
               <SwitchCamera size={20} />
               Switch to {metadata.type === 'module' ? 'Custom' : 'Module'} Format
@@ -341,8 +349,8 @@ function App() {
 
           {metadata.type === 'module' ? (
             <div className="grid gap-6 sm:grid-cols-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Module
                 </label>
                 <input
@@ -350,12 +358,12 @@ function App() {
                   value={metadata.module}
                   onChange={e => updateModuleMetadata({ module: e.target.value })}
                   placeholder="e.g., First Year"
-                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                  className="w-full"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Subject
                 </label>
                 <input
@@ -363,12 +371,12 @@ function App() {
                   value={metadata.subject}
                   onChange={e => updateModuleMetadata({ subject: e.target.value })}
                   placeholder="e.g., Biology"
-                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                  className="w-full"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Lesson
                 </label>
                 <input
@@ -376,14 +384,14 @@ function App() {
                   value={metadata.lesson}
                   onChange={e => updateModuleMetadata({ lesson: e.target.value })}
                   placeholder="e.g., Cell Biology"
-                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                  className="w-full"
                 />
               </div>
             </div>
           ) : (
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Title
                 </label>
                 <input
@@ -391,25 +399,22 @@ function App() {
                   value={metadata.title}
                   onChange={e => updateCustomMetadata({ title: e.target.value })}
                   placeholder="e.g., Biology Quiz - Cell Structure"
-                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                  className="w-full"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Tags
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {metadata.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm"
-                    >
+                    <span key={index} className="tag group">
                       <Tag size={14} />
                       {tag}
                       <button
                         onClick={() => removeTag(index)}
-                        className="ml-1 hover:text-red-600 transition-colors"
+                        className="ml-1 opacity-0 group-hover:opacity-100 hover:text-red-600 transition-all"
                       >
                         <X size={14} />
                       </button>
@@ -420,7 +425,7 @@ function App() {
                   <input
                     type="text"
                     placeholder="Add a tag"
-                    className="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                    className="flex-1"
                     onKeyPress={e => {
                       if (e.key === 'Enter') {
                         const input = e.target as HTMLInputElement;
@@ -431,7 +436,7 @@ function App() {
                       }
                     }}
                   />
-                  <button
+                  <button 
                     onClick={() => {
                       const input = document.querySelector('input[placeholder="Add a tag"]') as HTMLInputElement;
                       if (input.value.trim()) {
@@ -439,7 +444,7 @@ function App() {
                         input.value = '';
                       }
                     }}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
+                    className="btn-primary"
                   >
                     Add Tag
                   </button>
@@ -449,7 +454,7 @@ function App() {
           )}
 
           {!isMetadataValid() && (
-            <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600">
+            <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600 animate-fade-in">
               <AlertCircle size={20} />
               <p className="text-sm font-medium">
                 {metadata.type === 'module' 
@@ -464,14 +469,21 @@ function App() {
         {questions.map((question, index) => (
           <div 
             key={index}
-            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl ${
-              isQuestionValid(question) ? 'border-transparent' : 'border-2 border-amber-200'
+            className={`glass-card p-8 animate-slide-up ${
+              !isQuestionValid(question) && 'ring-2 ring-amber-200'
             }`}
           >
             <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Question {question.sn}
-              </h2>
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  Question {question.sn}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {isQuestionValid(question) 
+                    ? 'All required fields are filled'
+                    : 'Some required fields need attention'}
+                </p>
+              </div>
               <button
                 onClick={() => removeQuestion(index)}
                 className={`p-2 rounded-xl hover:bg-red-50 text-red-600 hover:text-red-700 transition-all duration-300 ${
@@ -484,8 +496,8 @@ function App() {
             </div>
 
             <div className="grid gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Question Text
                 </label>
                 <textarea
@@ -493,13 +505,13 @@ function App() {
                   onChange={e => updateQuestion(index, { question: e.target.value })}
                   placeholder="Enter your question here..."
                   rows={3}
-                  className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                  className="w-full"
                 />
               </div>
 
               <div className="grid gap-6 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
                     Source
                   </label>
                   <input
@@ -507,18 +519,18 @@ function App() {
                     value={question.source}
                     onChange={e => updateQuestion(index, { source: e.target.value })}
                     placeholder="e.g., Science, History, Math"
-                    className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                    className="w-full"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
                     Correct Answer
                   </label>
                   <select
                     value={question.answer}
                     onChange={e => updateQuestion(index, { answer: e.target.value as Option })}
-                    className="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300"
+                    className="w-full"
                   >
                     <option value="">Select correct answer</option>
                     {getAvailableOptions(index).map(opt => (
@@ -532,8 +544,8 @@ function App() {
 
               <div className="mt-6 grid gap-6 sm:grid-cols-2">
                 {getAvailableOptions(index).map(opt => (
-                  <div key={opt}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div key={opt} className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
                       Option {opt.toUpperCase()}
                       {question.answer === opt && (
                         <span className="ml-2 text-green-600 font-medium">(correct)</span>
@@ -544,8 +556,8 @@ function App() {
                       value={question[opt]}
                       onChange={e => updateQuestion(index, { [opt]: e.target.value })}
                       placeholder={`Enter option ${opt.toUpperCase()}`}
-                      className={`w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 ${
-                        question.answer === opt ? 'border-green-200 bg-green-50' : ''
+                      className={`w-full ${
+                        question.answer === opt ? 'border-green-200 bg-green-50/50' : ''
                       }`}
                     />
                   </div>
@@ -556,7 +568,7 @@ function App() {
                 <button
                   onClick={() => addExtraOption(index)}
                   disabled={(extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all duration-300 ${
+                  className={`btn-secondary flex items-center gap-2 ${
                     (extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -567,7 +579,7 @@ function App() {
             </div>
 
             {!isQuestionValid(question) && (
-              <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600">
+              <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600 animate-fade-in">
                 <AlertCircle size={20} />
                 <p className="text-sm font-medium">
                   {getQuestionValidationMessage(question)}
@@ -580,7 +592,7 @@ function App() {
         {/* Add Question Button */}
         <button
           onClick={addQuestion}
-          className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl shadow-md hover:shadow-lg active:shadow-sm transition-all duration-300"
+          className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl shadow-md hover:shadow-lg active:shadow-sm transition-all duration-300 animate-fade-in"
         >
           <PlusCircle size={20} />
           Add Question
