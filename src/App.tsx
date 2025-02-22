@@ -1,5 +1,22 @@
 import React, { useState } from 'react';
-import { AlertCircle, PlusCircle, Trash2, HelpCircle, X, ChevronRight, FileQuestion, Settings, Download, Tag, BookOpen, SwitchCamera } from 'lucide-react';
+import {
+  AlertCircle,
+  PlusCircle,
+  Trash2,
+  HelpCircle,
+  X,
+  ChevronRight,
+  FileQuestion,
+  Settings,
+  Download,
+  Tag,
+  BookOpen,
+  SwitchCamera,
+  Bookmark,
+  GraduationCap,
+  Layout,
+  ListChecks
+} from 'lucide-react';
 import type { QuizMetadata, ModuleMetadata, CustomMetadata, QuizQuestion, Option } from './types';
 
 const DEFAULT_OPTIONS: Option[] = ['a', 'b', 'c', 'd'];
@@ -110,9 +127,29 @@ function App() {
   };
 
   const updateQuestion = (index: number, updates: Partial<QuizQuestion>) => {
-    setQuestions(prev => prev.map((q, i) => 
-      i === index ? { ...q, ...updates } : q
-    ));
+    setQuestions(prev => prev.map((q, i) => {
+      if (i === index) {
+        // Ensure all required fields are present
+        const updatedQuestion: QuizQuestion = {
+          ...q,
+          ...updates,
+          // Ensure these required fields are always strings
+          sn: updates.sn || q.sn,
+          source: updates.source || q.source,
+          question: updates.question || q.question,
+          answer: updates.answer || q.answer,
+          a: updates.a || q.a,
+          b: updates.b || q.b,
+          c: updates.c || q.c,
+          d: updates.d || q.d,
+          e: updates.e || q.e,
+          f: updates.f || q.f,
+          g: updates.g || q.g,
+        };
+        return updatedQuestion;
+      }
+      return q;
+    }));
   };
 
   const getFilledOptionsCount = (question: QuizQuestion) => {
@@ -256,276 +293,171 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex justify-between items-center animate-fade-in">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              Quiz Question Editor
-            </h1>
-            <p className="mt-2 text-gray-600">Create and manage your quiz questions with ease</p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center space-x-3">
+            <FileQuestion className="w-8 h-8 text-indigo-600" />
+            <h1 className="text-3xl font-bold text-gray-900">Quiz Creator</h1>
           </div>
-          
-          <div className="flex gap-4">
+          <div className="flex items-center space-x-4">
             <button
-              onClick={() => setShowHelp(prev => !prev)}
-              className="btn-secondary"
+              onClick={() => setShowHelp(true)}
+              className="p-2 text-gray-500 hover:text-indigo-600 transition-colors"
+              aria-label="Help"
             >
-              <HelpCircle size={20} />
-              Help
+              <HelpCircle className="w-5 h-5" />
             </button>
-            <button
-              onClick={downloadJSON}
-              disabled={!areAllQuestionsValid}
-              className={`btn-primary flex items-center gap-2 ${
-                !areAllQuestionsValid && 'opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <Download size={20} />
-              Download JSON
-            </button>
+            <div className="relative group">
+              <button
+                onClick={downloadJSON}
+                disabled={!areAllQuestionsValid}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all
+                  ${areAllQuestionsValid
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+              >
+                <Download className="w-4 h-4" />
+                <span>Export JSON</span>
+              </button>
+              {!areAllQuestionsValid && (
+                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-100 p-3 hidden group-hover:block z-10">
+                  <div className="text-sm text-gray-600">
+                    <div className="font-medium text-gray-900 mb-2">Please fix the following:</div>
+                    <ul className="space-y-1">
+                      {!isMetadataValid() && (
+                        <li className="flex items-center space-x-2 text-amber-600">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                          <span>
+                            {metadata.type === 'module'
+                              ? 'Fill in all module details (module, subject, lesson)'
+                              : 'Fill in module, title, and add at least one tag'}
+                          </span>
+                        </li>
+                      )}
+                      {questions.map((q, i) => !isQuestionValid(q) && (
+                        <li key={i} className="flex items-center space-x-2 text-amber-600">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                          <span>Question {q.sn}: {getQuestionValidationMessage(q)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Help Modal */}
-        {showHelp && (
-          <div className="fixed inset-0 z-50 overflow-y-auto animate-fade-in">
-            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" onClick={() => setShowHelp(false)} />
-            <div className="relative min-h-screen flex items-center justify-center p-4">
-              <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl max-w-3xl w-full mx-auto animate-modal">
-                <div className="absolute right-4 top-4">
-                  <button
-                    onClick={() => setShowHelp(false)}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-                
-                <div className="px-8 py-6 border-b border-gray-200">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl">
-                      <HelpCircle className="text-indigo-600" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-semibold text-gray-900">Welcome to Quiz Editor</h3>
-                      <p className="text-gray-500 mt-1">Learn how to create perfect quiz questions</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100/50 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg">
-                          <FileQuestion size={18} className="text-indigo-600" />
-                        </div>
-                        Creating Questions
-                      </h4>
-                      <ul className="space-y-4">
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-indigo-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-indigo-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Quiz Details</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Fill in the module, subject, and lesson information</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-indigo-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-indigo-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Question Content</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Write your question and specify its source</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-indigo-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-indigo-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Answer Options</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Add at least 2 options and mark the correct one</p>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                          <Settings size={18} className="text-purple-600" />
-                        </div>
-                        Advanced Features
-                      </h4>
-                      <ul className="space-y-4">
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-purple-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-purple-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Multiple Options</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Add up to 7 options (A-G) for complex questions</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-purple-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-purple-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Validation</span>
-                            <p className="text-sm text-gray-600 mt-0.5">All required fields are checked automatically</p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3 bg-white/80 p-3 rounded-lg">
-                          <div className="p-1.5 bg-purple-100 rounded-full mt-0.5">
-                            <ChevronRight size={12} className="text-purple-600" />
-                          </div>
-                          <div>
-                            <span className="font-medium text-gray-900">Export</span>
-                            <p className="text-sm text-gray-600 mt-0.5">Download your quiz as JSON when all fields are valid</p>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
-                    <button
-                      onClick={() => setShowHelp(false)}
-                      className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl transition-all shadow-sm hover:shadow-md"
-                    >
-                      <span className="font-medium">Start Creating</span>
-                      <ChevronRight size={18} />
-                    </button>
-                  </div>
-                </div>
+        {/* Main Content */}
+        <div className="space-y-8">
+          {/* Metadata Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center space-x-3">
+                <BookOpen className="w-5 h-5 text-indigo-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Quiz Details</h2>
               </div>
+              <button
+                onClick={toggleMetadataType}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
+              >
+                <SwitchCamera className="w-4 h-4" />
+                <span>Switch to {metadata.type === 'module' ? 'Custom' : 'Module'}</span>
+              </button>
             </div>
-          </div>
-        )}
 
-        {/* Metadata Section */}
-        <div className={`glass-card p-8 animate-slide-up ${
-          !isMetadataValid() && 'ring-2 ring-amber-200'
-        }`}>
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Quiz Details
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {metadata.type === 'module' 
-                  ? 'Organize your quiz by module, subject, and lesson'
-                  : 'Specify module, title, and add relevant tags'}
-              </p>
-            </div>
-            <button
-              onClick={toggleMetadataType}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <SwitchCamera size={20} />
-              Switch to {metadata.type === 'module' ? 'Custom' : 'Module'} Format
-            </button>
-          </div>
-
-          {metadata.type === 'module' ? (
-            <div className="grid gap-6 sm:grid-cols-3">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Module
-                </label>
-                <input
-                  type="text"
-                  value={metadata.module}
-                  onChange={e => updateModuleMetadata({ module: e.target.value })}
-                  placeholder="e.g., First Year"
-                  className="w-full rounded-[25px] px-6 py-3"
-                />
+            {!isMetadataValid() && (
+              <div className="mb-6 flex items-start space-x-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <p className="text-sm">
+                  {metadata.type === 'module'
+                    ? 'Please fill in all required fields: module, subject, and lesson.'
+                    : 'Please fill in the module, title, and add at least one tag.'}
+                </p>
               </div>
+            )}
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  value={metadata.subject}
-                  onChange={e => updateModuleMetadata({ subject: e.target.value })}
-                  placeholder="e.g., Biology"
-                  className="w-full rounded-[25px] px-6 py-3"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Lesson
-                </label>
-                <input
-                  type="text"
-                  value={metadata.lesson}
-                  onChange={e => updateModuleMetadata({ lesson: e.target.value })}
-                  placeholder="e.g., Cell Biology"
-                  className="w-full rounded-[25px] px-6 py-3"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={metadata.title}
-                  onChange={e => updateCustomMetadata({ title: e.target.value })}
-                  placeholder="e.g., Biology Quiz - Cell Structure"
-                  className="w-full rounded-[25px] px-6 py-3"
-                />
-              </div>
-
-              <div className="grid gap-6 sm:grid-cols-2">
+            {metadata.type === 'module' ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Module
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">Module</label>
                   <input
                     type="text"
                     value={metadata.module}
-                    onChange={e => updateCustomMetadata({ module: e.target.value })}
-                    placeholder="e.g., First Year"
-                    className="w-full rounded-[25px] px-6 py-3"
+                    onChange={(e) => updateModuleMetadata({ module: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter module name"
                   />
                 </div>
-
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Tags
-                  </label>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <label className="block text-sm font-medium text-gray-700">Subject</label>
+                  <input
+                    type="text"
+                    value={metadata.subject}
+                    onChange={(e) => updateModuleMetadata({ subject: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter subject"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Lesson</label>
+                  <input
+                    type="text"
+                    value={metadata.lesson}
+                    onChange={(e) => updateModuleMetadata({ lesson: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter lesson"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Module</label>
+                    <input
+                      type="text"
+                      value={metadata.module}
+                      onChange={(e) => updateCustomMetadata({ module: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Enter module name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                    <input
+                      type="text"
+                      value={metadata.title}
+                      onChange={(e) => updateCustomMetadata({ title: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Enter quiz title"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Tags</label>
+                  <div className="flex flex-wrap gap-2">
                     {metadata.tags.map((tag, index) => (
-                      <span key={index} className="tag group">
-                        <Tag size={14} />
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
+                      >
                         {tag}
                         <button
                           onClick={() => removeTag(index)}
-                          className="ml-1 opacity-0 group-hover:opacity-100 hover:text-red-600 transition-all"
+                          className="ml-2 text-indigo-600 hover:text-indigo-800"
                         >
-                          <X size={14} />
+                          <X className="w-3 h-3" />
                         </button>
                       </span>
                     ))}
-                  </div>
-                  <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Add a tag"
-                      className="flex-1 rounded-[25px] px-6 py-3"
-                      onKeyPress={e => {
+                      placeholder="Add tag..."
+                      className="px-3 py-1 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           const input = e.target as HTMLInputElement;
                           if (input.value.trim()) {
@@ -535,169 +467,192 @@ function App() {
                         }
                       }}
                     />
-                    <button 
-                      onClick={() => {
-                        const input = document.querySelector('input[placeholder="Add a tag"]') as HTMLInputElement;
-                        if (input.value.trim()) {
-                          addTag(input.value.trim());
-                          input.value = '';
-                        }
-                      }}
-                      className="btn-primary"
-                    >
-                      Add Tag
-                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-
-          {!isMetadataValid() && (
-            <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600 animate-fade-in">
-              <AlertCircle size={20} />
-              <p className="text-sm font-medium">
-                {metadata.type === 'module' 
-                  ? 'Please fill in the module, subject, and lesson fields.'
-                  : 'Please fill in the module, title, and add at least one tag.'}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Questions Section */}
-        {questions.map((question, index) => (
-          <div 
-            key={index}
-            className={`glass-card p-8 animate-slide-up ${
-              !isQuestionValid(question) && 'ring-2 ring-amber-200'
-            }`}
-          >
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Question {question.sn}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {isQuestionValid(question) 
-                    ? 'All required fields are filled'
-                    : 'Some required fields need attention'}
-                </p>
-              </div>
-              <button
-                onClick={() => removeQuestion(index)}
-                className={`p-2 rounded-xl hover:bg-red-50 text-red-600 hover:text-red-700 transition-all duration-300 ${
-                  questions.length === 1 ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                disabled={questions.length === 1}
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
-
-            <div className="grid gap-6">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Question Text
-                </label>
-                <textarea
-                  value={question.question}
-                  onChange={e => updateQuestion(index, { question: e.target.value })}
-                  placeholder="Enter your question here..."
-                  rows={3}
-                  className="w-full rounded-[25px] px-6 py-4"
-                />
-              </div>
-
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Source
-                  </label>
-                  <input
-                    type="text"
-                    value={question.source}
-                    onChange={e => updateQuestion(index, { source: e.target.value })}
-                    placeholder="e.g., Science, History, Math"
-                    className="w-full rounded-[25px] px-6 py-3"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Correct Answer
-                  </label>
-                  <select
-                    value={question.answer}
-                    onChange={e => updateQuestion(index, { answer: e.target.value as Option })}
-                    className="w-full rounded-[25px] px-6 py-3"
-                  >
-                    <option value="">Select correct answer</option>
-                    {getAvailableOptions(index).map(opt => (
-                      <option key={opt} value={opt}>
-                        Option {opt.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-6 sm:grid-cols-2">
-                {getAvailableOptions(index).map(opt => (
-                  <div key={opt} className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Option {opt.toUpperCase()}
-                      {question.answer === opt && (
-                        <span className="ml-2 text-green-600 font-medium">(correct)</span>
-                      )}
-                    </label>
-                    <input
-                      type="text"
-                      value={question[opt]}
-                      onChange={e => updateQuestion(index, { [opt]: e.target.value })}
-                      placeholder={`Enter option ${opt.toUpperCase()}`}
-                      className={`w-full rounded-[25px] px-6 py-3 ${
-                        question.answer === opt ? 'border-green-200 bg-green-50/50' : ''
-                      }`}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={() => addExtraOption(index)}
-                  disabled={(extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(question, getAvailableOptions(index))}
-                  className={`btn-secondary flex items-center gap-2 ${
-                    ((extraOptionsCount[index] || 0) >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(question, getAvailableOptions(index))) ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <PlusCircle size={20} />
-                  {areOptionsFilledInSequence(question, getAvailableOptions(index)) ? 'Add Option' : 'Fill options in sequence'}
-                </button>
-              </div>
-            </div>
-
-            {!isQuestionValid(question) && (
-              <div className="mt-6 flex items-center gap-3 px-4 py-2 bg-amber-50 rounded-xl text-amber-600 animate-fade-in">
-                <AlertCircle size={20} />
-                <p className="text-sm font-medium">
-                  {getQuestionValidationMessage(question)}
-                </p>
               </div>
             )}
           </div>
-        ))}
 
-        {/* Add Question Button */}
-        <button
-          onClick={addQuestion}
-          className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl shadow-md hover:shadow-lg active:shadow-sm transition-all duration-300 animate-fade-in"
-        >
-          <PlusCircle size={20} />
-          Add Question
-        </button>
+          {/* Questions Section */}
+          <div className="space-y-6">
+            {questions.map((question, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold">
+                      {question.sn}
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Question {question.sn}</h3>
+                  </div>
+                  <button
+                    onClick={() => removeQuestion(index)}
+                    className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                    aria-label="Remove question"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">Source</label>
+                      <input
+                        type="text"
+                        value={question.source}
+                        onChange={(e) => updateQuestion(index, { source: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Enter question source"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Correct Answer
+                      </label>
+                      <select
+                        value={question.answer}
+                        onChange={(e) => updateQuestion(index, { answer: e.target.value as Option })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select correct answer</option>
+                        {getAvailableOptions(index).map((opt) => (
+                          <option key={opt} value={opt}>
+                            Option {opt.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Question Text</label>
+                    <textarea
+                      value={question.question}
+                      onChange={(e) => updateQuestion(index, { question: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      rows={3}
+                      placeholder="Enter your question"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">Options</label>
+                      <div className="relative group">
+                        <button
+                          onClick={() => addExtraOption(index)}
+                          disabled={extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))}
+                          className={`flex items-center space-x-1 text-sm font-medium
+                            ${extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-indigo-600 hover:text-indigo-800'}`}
+                        >
+                          <PlusCircle className="w-4 h-4" />
+                          <span>Add Option</span>
+                        </button>
+                        {(extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))) && (
+                          <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 p-3 hidden group-hover:block z-10">
+                            <div className="text-sm text-gray-600">
+                              {extraOptionsCount[index] >= EXTRA_OPTIONS.length ? (
+                                <span>Maximum number of options (7) reached</span>
+                              ) : !areOptionsFilledInSequence(questions[index], getAvailableOptions(index)) ? (
+                                <span>Please fill in existing options in sequence before adding more</span>
+                              ) : null}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {getAvailableOptions(index).map((opt) => (
+                        <div key={opt} className="relative">
+                          <input
+                            type="text"
+                            value={question[opt]}
+                            onChange={(e) => updateQuestion(index, { [opt]: e.target.value })}
+                            className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                              ${question.answer === opt
+                                ? 'border-green-500 bg-green-50'
+                                : 'border-gray-300'}`}
+                            placeholder={`Option ${opt.toUpperCase()}`}
+                          />
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">
+                            {opt.toUpperCase()}.
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {!isQuestionValid(question) && (
+                    <div className="flex items-start space-x-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm">{getQuestionValidationMessage(question)}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            <button
+              onClick={addQuestion}
+              className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:text-indigo-600 hover:border-indigo-300 transition-colors flex items-center justify-center space-x-2"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span className="font-medium">Add New Question</span>
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Help Guide</h2>
+                <button
+                  onClick={() => setShowHelp(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="prose prose-indigo max-w-none">
+                <h3>Creating a Quiz</h3>
+                <p>
+                  Start by selecting either Module or Custom quiz type. Fill in all required metadata
+                  fields for your quiz.
+                </p>
+                <h3>Adding Questions</h3>
+                <p>
+                  Each question requires:
+                  <ul>
+                    <li>A source reference</li>
+                    <li>The question text</li>
+                    <li>At least 2 options</li>
+                    <li>A correct answer selection</li>
+                  </ul>
+                </p>
+                <h3>Options</h3>
+                <p>
+                  You can add up to 7 options (A-G) for each question. Options must be filled in
+                  sequence without gaps.
+                </p>
+                <h3>Exporting</h3>
+                <p>
+                  Once all questions are valid and complete, click the Export JSON button to download
+                  your quiz.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
