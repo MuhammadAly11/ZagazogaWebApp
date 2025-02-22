@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  input, textarea, select {
+    @apply border-gray-300 rounded-md shadow-sm transition-all duration-200;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply border-indigo-500 ring-1 ring-indigo-500;
+  }
+
+  input::placeholder, textarea::placeholder {
+    @apply text-gray-400;
+  }
+}
