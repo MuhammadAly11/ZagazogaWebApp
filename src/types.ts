@@ -1,8 +1,17 @@
-export interface QuizMetadata {
+export interface ModuleMetadata {
+  type: 'module';
   module: string;
   subject: string;
   lesson: string;
 }
+
+export interface CustomMetadata {
+  type: 'custom';
+  title: string;
+  tags: string[];
+}
+
+export type QuizMetadata = ModuleMetadata | CustomMetadata;
 
 export interface QuizQuestion {
   sn: string;
