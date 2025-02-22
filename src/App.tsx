@@ -337,7 +337,7 @@ function App() {
               <p className="text-sm text-gray-500 mt-1">
                 {metadata.type === 'module' 
                   ? 'Organize your quiz by module, subject, and lesson'
-                  : 'Add a title and relevant tags for your quiz'}
+                  : 'Specify module, title, and add relevant tags'}
               </p>
             </div>
             <button
