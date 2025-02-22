@@ -14,6 +14,7 @@ const INITIAL_MODULE_METADATA: ModuleMetadata = {
 
 const INITIAL_CUSTOM_METADATA: CustomMetadata = {
   type: 'custom',
+  module: '',
   title: '',
   tags: [],
 };
@@ -85,7 +86,8 @@ function App() {
              metadata.subject.trim() !== '' &&
              metadata.lesson.trim() !== '';
     } else {
-      return metadata.title.trim() !== '' &&
+      return metadata.module.trim() !== '' &&
+             metadata.title.trim() !== '' &&
              metadata.tags.length > 0;
     }
   };
@@ -390,17 +392,32 @@ function App() {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={metadata.title}
-                  onChange={e => updateCustomMetadata({ title: e.target.value })}
-                  placeholder="e.g., Biology Quiz - Cell Structure"
-                  className="w-full"
-                />
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Module
+                  </label>
+                  <input
+                    type="text"
+                    value={metadata.module}
+                    onChange={e => updateCustomMetadata({ module: e.target.value })}
+                    placeholder="e.g., First Year"
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={metadata.title}
+                    onChange={e => updateCustomMetadata({ title: e.target.value })}
+                    placeholder="e.g., Biology Quiz - Cell Structure"
+                    className="w-full"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -459,7 +476,7 @@ function App() {
               <p className="text-sm font-medium">
                 {metadata.type === 'module' 
                   ? 'Please fill in the module, subject, and lesson fields.'
-                  : 'Please add a title and at least one tag.'}
+                  : 'Please fill in the module, title, and add at least one tag.'}
               </p>
             </div>
           )}

@@ -7,6 +7,7 @@ export interface ModuleMetadata {
 
 export interface CustomMetadata {
   type: 'custom';
+  module: string;
   title: string;
   tags: string[];
 }
