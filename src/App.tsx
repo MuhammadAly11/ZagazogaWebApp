@@ -360,7 +360,7 @@ function App() {
                   value={metadata.module}
                   onChange={e => updateModuleMetadata({ module: e.target.value })}
                   placeholder="e.g., First Year"
-                  className="w-full"
+                  className="w-full rounded-[25px] px-6 py-3"
                 />
               </div>
 
@@ -373,7 +373,7 @@ function App() {
                   value={metadata.subject}
                   onChange={e => updateModuleMetadata({ subject: e.target.value })}
                   placeholder="e.g., Biology"
-                  className="w-full"
+                  className="w-full rounded-[25px] px-6 py-3"
                 />
               </div>
 
@@ -386,7 +386,7 @@ function App() {
                   value={metadata.lesson}
                   onChange={e => updateModuleMetadata({ lesson: e.target.value })}
                   placeholder="e.g., Cell Biology"
-                  className="w-full"
+                  className="w-full rounded-[25px] px-6 py-3"
                 />
               </div>
             </div>
@@ -401,7 +401,7 @@ function App() {
                   value={metadata.title}
                   onChange={e => updateCustomMetadata({ title: e.target.value })}
                   placeholder="e.g., Biology Quiz - Cell Structure"
-                  className="w-full"
+                  className="w-full rounded-[25px] px-6 py-3"
                 />
               </div>
 
@@ -415,7 +415,7 @@ function App() {
                     value={metadata.module}
                     onChange={e => updateCustomMetadata({ module: e.target.value })}
                     placeholder="e.g., First Year"
-                    className="w-full"
+                    className="w-full rounded-[25px] px-6 py-3"
                   />
                 </div>
 
@@ -441,7 +441,7 @@ function App() {
                     <input
                       type="text"
                       placeholder="Add a tag"
-                      className="flex-1"
+                      className="flex-1 rounded-[25px] px-6 py-3"
                       onKeyPress={e => {
                         if (e.key === 'Enter') {
                           const input = e.target as HTMLInputElement;
@@ -522,7 +522,7 @@ function App() {
                   onChange={e => updateQuestion(index, { question: e.target.value })}
                   placeholder="Enter your question here..."
                   rows={3}
-                  className="w-full"
+                  className="w-full rounded-[25px] px-6 py-4"
                 />
               </div>
 
@@ -536,7 +536,7 @@ function App() {
                     value={question.source}
                     onChange={e => updateQuestion(index, { source: e.target.value })}
                     placeholder="e.g., Science, History, Math"
-                    className="w-full"
+                    className="w-full rounded-[25px] px-6 py-3"
                   />
                 </div>
 
@@ -547,7 +547,7 @@ function App() {
                   <select
                     value={question.answer}
                     onChange={e => updateQuestion(index, { answer: e.target.value as Option })}
-                    className="w-full"
+                    className="w-full rounded-[25px] px-6 py-3"
                   >
                     <option value="">Select correct answer</option>
                     {getAvailableOptions(index).map(opt => (
@@ -573,7 +573,7 @@ function App() {
                       value={question[opt]}
                       onChange={e => updateQuestion(index, { [opt]: e.target.value })}
                       placeholder={`Enter option ${opt.toUpperCase()}`}
-                      className={`w-full ${
+                      className={`w-full rounded-[25px] px-6 py-3 ${
                         question.answer === opt ? 'border-green-200 bg-green-50/50' : ''
                       }`}
                     />
