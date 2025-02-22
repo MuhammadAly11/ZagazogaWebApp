@@ -412,59 +412,86 @@ function App() {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Module</label>
-                    <input
-                      type="text"
-                      value={metadata.module}
-                      onChange={(e) => updateCustomMetadata({ module: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Enter module name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Title</label>
-                    <input
-                      type="text"
-                      value={metadata.title}
-                      onChange={(e) => updateCustomMetadata({ title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Enter quiz title"
-                    />
-                  </div>
-                </div>
+                {/* Title - Primary Field */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Tags</label>
-                  <div className="flex flex-wrap gap-2">
-                    {metadata.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
-                      >
-                        {tag}
-                        <button
-                          onClick={() => removeTag(index)}
-                          className="ml-2 text-indigo-600 hover:text-indigo-800"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                    <input
-                      type="text"
-                      placeholder="Add tag..."
-                      className="px-3 py-1 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          const input = e.target as HTMLInputElement;
-                          if (input.value.trim()) {
-                            addTag(input.value.trim());
-                            input.value = '';
-                          }
-                        }
-                      }}
-                    />
+                  <label className="block text-base font-medium text-gray-900">
+                    Title
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={metadata.title}
+                    onChange={(e) => updateCustomMetadata({ title: e.target.value })}
+                    className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                    placeholder="Enter quiz title"
+                  />
+                </div>
+
+                {/* Optional Fields - More Compact */}
+                <div className="pt-4">
+                  <div className="border-t border-gray-100">
+                    <div className="flex items-center mt-3 mb-4">
+                      <div className="h-px flex-1 bg-gray-100"></div>
+                      <span className="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider">Optional Details</span>
+                      <div className="h-px flex-1 bg-gray-100"></div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Module Field */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Module
+                        </label>
+                        <input
+                          type="text"
+                          value={metadata.module}
+                          onChange={(e) => updateCustomMetadata({ module: e.target.value })}
+                          className="w-full px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50/50"
+                          placeholder="Enter module name if applicable"
+                        />
+                      </div>
+
+                      {/* Tags Field */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Tags
+                        </label>
+                        <div className="space-y-1.5">
+                          {metadata.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {metadata.tags.map((tag, index) => (
+                                <span
+                                  key={index}
+                                  className="inline-flex items-center px-2 py-0.5 text-xs rounded bg-gray-50 text-gray-600 border border-gray-100"
+                                >
+                                  {tag}
+                                  <button
+                                    onClick={() => removeTag(index)}
+                                    className="ml-1 text-gray-400 hover:text-gray-600"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <input
+                            type="text"
+                            placeholder="Add tags (press Enter)"
+                            className="w-full px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50/50"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                const input = e.target as HTMLInputElement;
+                                if (input.value.trim()) {
+                                  addTag(input.value.trim());
+                                  input.value = '';
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
