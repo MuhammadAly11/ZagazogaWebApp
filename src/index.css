@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+  }
+
   body {
-    @apply bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 min-h-screen;
+    @apply antialiased text-gray-900 bg-gray-50;
   }
 
   input, textarea, select {
@@ -51,6 +55,22 @@
 
   .tag {
     @apply inline-flex items-center gap-1 px-3 py-1 bg-violet-50 text-violet-700 rounded-full text-sm transition-all duration-300 hover:bg-violet-100;
+  }
+
+  .prose h3 {
+    @apply text-lg font-semibold text-gray-900 mt-6 mb-4;
+  }
+
+  .prose p {
+    @apply text-gray-600 mb-4;
+  }
+
+  .prose ul {
+    @apply list-disc list-inside text-gray-600 mb-4;
+  }
+
+  .prose li {
+    @apply mb-2;
   }
 }
 
