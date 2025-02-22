@@ -392,6 +392,19 @@ function App() {
             </div>
           ) : (
             <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={metadata.title}
+                  onChange={e => updateCustomMetadata({ title: e.target.value })}
+                  placeholder="e.g., Biology Quiz - Cell Structure"
+                  className="w-full"
+                />
+              </div>
+
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
@@ -408,63 +421,50 @@ function App() {
 
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    Title
+                    Tags
                   </label>
-                  <input
-                    type="text"
-                    value={metadata.title}
-                    onChange={e => updateCustomMetadata({ title: e.target.value })}
-                    placeholder="e.g., Biology Quiz - Cell Structure"
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Tags
-                </label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {metadata.tags.map((tag, index) => (
-                    <span key={index} className="tag group">
-                      <Tag size={14} />
-                      {tag}
-                      <button
-                        onClick={() => removeTag(index)}
-                        className="ml-1 opacity-0 group-hover:opacity-100 hover:text-red-600 transition-all"
-                      >
-                        <X size={14} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add a tag"
-                    className="flex-1"
-                    onKeyPress={e => {
-                      if (e.key === 'Enter') {
-                        const input = e.target as HTMLInputElement;
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {metadata.tags.map((tag, index) => (
+                      <span key={index} className="tag group">
+                        <Tag size={14} />
+                        {tag}
+                        <button
+                          onClick={() => removeTag(index)}
+                          className="ml-1 opacity-0 group-hover:opacity-100 hover:text-red-600 transition-all"
+                        >
+                          <X size={14} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add a tag"
+                      className="flex-1"
+                      onKeyPress={e => {
+                        if (e.key === 'Enter') {
+                          const input = e.target as HTMLInputElement;
+                          if (input.value.trim()) {
+                            addTag(input.value.trim());
+                            input.value = '';
+                          }
+                        }
+                      }}
+                    />
+                    <button 
+                      onClick={() => {
+                        const input = document.querySelector('input[placeholder="Add a tag"]') as HTMLInputElement;
                         if (input.value.trim()) {
                           addTag(input.value.trim());
                           input.value = '';
                         }
-                      }
-                    }}
-                  />
-                  <button 
-                    onClick={() => {
-                      const input = document.querySelector('input[placeholder="Add a tag"]') as HTMLInputElement;
-                      if (input.value.trim()) {
-                        addTag(input.value.trim());
-                        input.value = '';
-                      }
-                    }}
-                    className="btn-primary"
-                  >
-                    Add Tag
-                  </button>
+                      }}
+                      className="btn-primary"
+                    >
+                      Add Tag
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
