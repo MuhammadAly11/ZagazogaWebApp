@@ -139,8 +139,9 @@ function App() {
     const hasSource = question.source.trim() !== '';
     const hasEnoughOptions = getFilledOptionsCount(question) >= 2;
     const hasAnswer = question.answer !== '';
+    const isAnswerValid = hasAnswer && (question.answer ? (question as any)[question.answer].trim() !== '' : false);
     
-    return hasQuestion && hasSource && hasEnoughOptions && hasAnswer;
+    return hasQuestion && hasSource && hasEnoughOptions && hasAnswer && isAnswerValid;
   };
 
   const getQuestionValidationMessage = (question: QuizQuestion) => {
@@ -150,6 +151,7 @@ function App() {
     if (!question.source.trim()) missing.push('source');
     if (getFilledOptionsCount(question) < 2) missing.push('at least 2 options');
     if (!question.answer) missing.push('correct answer selection');
+    else if (question.answer && (question as any)[question.answer].trim() === '') missing.push('content for the selected correct answer');
     
     return `Please ensure you have filled in: ${missing.join(', ')}.`;
   };
@@ -157,9 +159,27 @@ function App() {
   const areAllQuestionsValid = questions.every(isQuestionValid) && isMetadataValid();
 
   const downloadJSON = () => {
+    const cleanedQuestions = questions.map(question => {
+      const cleanQuestion: Partial<QuizQuestion> = {
+        sn: question.sn,
+        source: question.source,
+        question: question.question,
+        answer: question.answer,
+      };
+
+      (['a', 'b', 'c', 'd', 'e', 'f', 'g'] as const).forEach(opt => {
+        const value = (question as any)[opt];
+        if (value && value.trim() !== '') {
+          (cleanQuestion as any)[opt] = value;
+        }
+      });
+
+      return cleanQuestion;
+    });
+
     const dataStr = JSON.stringify({
       ...metadata,
-      questions
+      questions: cleanedQuestions
     }, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
