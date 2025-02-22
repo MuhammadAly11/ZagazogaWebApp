@@ -103,9 +103,7 @@ function App() {
              metadata.subject.trim() !== '' &&
              metadata.lesson.trim() !== '';
     } else {
-      return metadata.module.trim() !== '' &&
-             metadata.title.trim() !== '' &&
-             metadata.tags.length > 0;
+      return metadata.title.trim() !== '';
     }
   };
 
@@ -332,7 +330,7 @@ function App() {
                           <span>
                             {metadata.type === 'module'
                               ? 'Fill in all module details (module, subject, lesson)'
-                              : 'Fill in module, title, and add at least one tag'}
+                              : 'Fill in the quiz title'}
                           </span>
                         </li>
                       )}
@@ -374,7 +372,7 @@ function App() {
                 <p className="text-sm">
                   {metadata.type === 'module'
                     ? 'Please fill in all required fields: module, subject, and lesson.'
-                    : 'Please fill in the module, title, and add at least one tag.'}
+                    : 'Please fill in the quiz title.'}
                 </p>
               </div>
             )}
