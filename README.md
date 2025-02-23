@@ -11,6 +11,7 @@ A modern web application for creating and managing quiz questions with support f
 - Real-time validation
 - JSON export
 - Modern, responsive UI
+- Compatible with [Quizst](https://github.com/MuhammadAly11/Quizst) - Export your quizzes directly to beautiful Typst documents
 
 ## Quiz Modes
 
@@ -69,6 +70,18 @@ Example output:
   ]
 }
 ```
+
+## Integration
+
+### Quizst Integration
+
+The JSON output from Quiz Creator is fully compatible with [Quizst](https://github.com/MuhammadAly11/Quizst), a Typst template for creating professional MCQ exam papers. This means you can:
+
+1. Create your quiz using this web interface
+2. Export to JSON
+3. Use the JSON with Quizst to generate beautifully formatted PDF documents
+
+This integration provides a complete workflow from quiz creation to professional document generation.
 
 ## Getting Started
 
