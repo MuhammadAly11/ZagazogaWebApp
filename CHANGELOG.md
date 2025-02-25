@@ -2,7 +2,17 @@
 
 All notable changes to the Zagazoga Quiz Creator will be documented in this file.
 
-## [1.1.0] - 2024-02-23
+## [1.9.1] - 2025-02-25
+
+### Added
+- Clear buttons for all input fields to easily delete content
+- Tooltip explanations for why the "Add Option" button might be disabled
+
+### Fixed
+- Issue where users couldn't delete input field content after entering it
+- Improved user feedback for the "Add Option" button
+
+## [1.9.0] - 2025-02-25
 
 ### Added
 - Prominently featured Quizst integration with a dedicated banner section
