@@ -5,37 +5,15 @@ export default {
   theme: {
     extend: {
       animation: {
-        'gradient-x': 'gradient-x 15s ease infinite',
-        'modal': 'modal 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        'pulse-soft': 'pulse-soft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'fade-in': 'fade-in 0.2s ease-out',
       },
       keyframes: {
-        'gradient-x': {
-          '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': 'left center',
-          },
-          '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center',
-          },
-        },
-        'modal': {
+        'fade-in': {
           '0%': {
             opacity: '0',
-            transform: 'scale(0.95) translateY(-10px)',
           },
           '100%': {
             opacity: '1',
-            transform: 'scale(1) translateY(0)',
-          },
-        },
-        'pulse-soft': {
-          '0%, 100%': {
-            opacity: '1',
-          },
-          '50%': {
-            opacity: '0.8',
           },
         },
       },
@@ -48,12 +26,6 @@ export default {
               '&:hover': {
                 color: theme('colors.purple.800'),
               },
-            },
-            'h1, h2, h3, h4, h5, h6': {
-              color: theme('colors.gray.900'),
-            },
-            strong: {
-              color: theme('colors.purple.600'),
             },
           },
         },

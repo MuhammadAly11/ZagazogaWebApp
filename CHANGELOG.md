@@ -2,6 +2,20 @@
 
 All notable changes to the Zagazoga Quiz Creator will be documented in this file.
 
+## [2.0.0] - 2025-03-01
+
+### Changed
+- Major refactoring of codebase for improved maintainability
+- Simplified App.tsx by removing redundant code and improving structure
+- Removed unused CSS animations and styles from index.css
+- Simplified Tailwind configuration by removing unused animations
+- Streamlined README for better readability and focus
+
+### Improved
+- Reduced overall codebase size while maintaining all functionality
+- Enhanced code readability and maintainability
+- Improved performance by removing unnecessary code
+
 ## [1.9.1] - 2025-02-25
 
 ### Added
