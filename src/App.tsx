@@ -18,7 +18,9 @@ import {
   ListChecks,
   Moon,
   Sun,
-  Monitor
+  Monitor,
+  FileText,
+  ExternalLink
 } from 'lucide-react';
 import type { QuizMetadata, CustomMetadata, QuizQuestion, Option, LessonMetadata } from './types';
 
@@ -347,6 +349,12 @@ function App() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+
+    // Show the PDF info after download
+    setShowPdfInfo(true);
+    setTimeout(() => {
+      setShowPdfInfo(false);
+    }, 8000);
   };
 
   const enableSystemTheme = () => {
@@ -354,21 +362,80 @@ function App() {
     setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   };
 
+  // Add the infoBox state
+  const [showPdfInfo, setShowPdfInfo] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 dark:text-gray-100">
+      {/* PDF Info Toast */}
+      {showPdfInfo && (
+        <div className="fixed top-4 right-4 left-4 md:left-auto md:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-purple-100 dark:border-purple-900 p-4 animate-fade-in z-50">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Create PDF Quizzes with Quizst</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Use <a href="https://github.com/MuhammadAly11/Quizst" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 font-semibold hover:underline">Quizst</a> to convert your JSON into beautifully formatted PDF exam papers!
+              </p>
+            </div>
+            <button
+              onClick={() => setShowPdfInfo(false)}
+              className="flex-shrink-0 ml-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-3">
-            <FileQuestion className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quiz Creator</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center space-x-3 mb-4 md:mb-0">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full blur-sm opacity-70"></div>
+              <div className="relative bg-white dark:bg-gray-800 rounded-full p-2">
+                <FileQuestion className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Zagazoga</span> Quiz Creator
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Create interactive quizzes and export them as JSON</p>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
+            <button 
+              onClick={downloadJSON} 
+              disabled={!questions.every(isQuestionValid) || !isMetadataValid()}
+              className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 
+                disabled:opacity-50 disabled:cursor-not-allowed 
+                bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 
+                shadow-md hover:shadow-lg disabled:shadow-none"
+              title={!isMetadataValid() || !questions.every(isQuestionValid) ? 'Please fill in all required fields' : 'Download quiz as JSON'}
+            >
+              <Download className="w-5 h-5" />
+              <span>Export JSON</span>
+            </button>
+            <button
+              onClick={() => setShowHelp(true)}
+              className="p-2.5 text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700"
+              aria-label="Help"
+              title="Show help guide"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
             <div className="relative group">
               <button
                 onClick={() => {}}
-                className="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
+                className="p-2.5 text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700"
                 aria-label="Theme settings"
+                title="Theme settings"
               >
                 {followSystem ? (
                   <Monitor className="w-5 h-5" />
@@ -382,7 +449,7 @@ function App() {
                 <button
                   onClick={() => { setFollowSystem(false); setDarkMode(false); }}
                   className={`w-full px-3 py-2 text-sm text-left flex items-center space-x-2 hover:bg-gray-50 dark:hover:bg-gray-700
-                    ${!followSystem && !darkMode ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300'}`}
+                    ${!followSystem && !darkMode ? 'text-purple-600 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'}`}
                 >
                   <Sun className="w-4 h-4" />
                   <span>Light</span>
@@ -390,7 +457,7 @@ function App() {
                 <button
                   onClick={() => { setFollowSystem(false); setDarkMode(true); }}
                   className={`w-full px-3 py-2 text-sm text-left flex items-center space-x-2 hover:bg-gray-50 dark:hover:bg-gray-700
-                    ${!followSystem && darkMode ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300'}`}
+                    ${!followSystem && darkMode ? 'text-purple-600 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'}`}
                 >
                   <Moon className="w-4 h-4" />
                   <span>Dark</span>
@@ -399,73 +466,52 @@ function App() {
                 <button
                   onClick={enableSystemTheme}
                   className={`w-full px-3 py-2 text-sm text-left flex items-center space-x-2 hover:bg-gray-50 dark:hover:bg-gray-700
-                    ${followSystem ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300'}`}
+                    ${followSystem ? 'text-purple-600 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'}`}
                 >
                   <Monitor className="w-4 h-4" />
                   <span>System</span>
                 </button>
               </div>
             </div>
-            <button
-              onClick={() => setShowHelp(true)}
-              className="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
-              aria-label="Help"
-            >
-              <HelpCircle className="w-5 h-5" />
-            </button>
-            <div className="relative group">
-              <button
-                onClick={downloadJSON}
-                disabled={!areAllQuestionsValid}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all
-                  ${areAllQuestionsValid
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'}`}
-              >
-                <Download className="w-4 h-4" />
-                <span>Export JSON</span>
-              </button>
-              {!areAllQuestionsValid && (
-                <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 p-3 hidden group-hover:block z-10">
-                  <div className="text-sm text-gray-600 dark:text-gray-300">
-                    <div className="font-medium text-gray-900 dark:text-white mb-2">Please fix the following:</div>
-                    <ul className="space-y-1">
-                      {!isMetadataValid() && (
-                        <li className="flex items-center space-x-2 text-amber-600 dark:text-amber-500">
-                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                          <span>
-                            {metadata.type === 'lesson'
-                              ? 'Fill in all lesson details (module, subject, lesson)'
-                              : 'Fill in the quiz title'}
-                          </span>
-                        </li>
-                      )}
-                      {questions.map((q, i) => !isQuestionValid(q) && (
-                        <li key={i} className="flex items-center space-x-2 text-amber-600 dark:text-amber-500">
-                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                          <span>Question {q.sn}: {getQuestionValidationMessage(q)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="space-y-8">
+          {/* Quizst Integration Banner */}
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl shadow-sm border border-purple-100 dark:border-purple-800/30 p-4 md:p-6">
+            <div className="flex flex-col md:flex-row md:items-center">
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white">Quizst Integration</h2>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 md:mb-0 md:mr-6">
+                  The JSON output from Zagazoga Quiz Creator is fully compatible with <a href="https://github.com/MuhammadAly11/Quizst" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 font-semibold hover:underline">Quizst</a>, a Typst template for creating professional MCQ exam papers. Export your quiz and generate beautiful PDF documents.
+                </p>
+              </div>
+              <a 
+                href="https://github.com/MuhammadAly11/Quizst"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 px-5 py-2.5 rounded-lg text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 transition-colors shadow-sm"
+              >
+                <span>Learn More</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+
           {/* Metadata Section */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center space-x-3">
-                <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <BookOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Quiz Details</h2>
               </div>
               <button
                 onClick={toggleMetadataType}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <SwitchCamera className="w-4 h-4" />
                 <span>Switch to {metadata.type === 'lesson' ? 'Custom Mode' : 'Lesson Mode'}</span>
@@ -491,7 +537,7 @@ function App() {
                     type="text"
                     value={metadata.module}
                     onChange={(e) => updateLessonMetadata({ module: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter module name"
                   />
                 </div>
@@ -501,7 +547,7 @@ function App() {
                     type="text"
                     value={metadata.subject}
                     onChange={(e) => updateLessonMetadata({ subject: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter subject"
                   />
                 </div>
@@ -511,7 +557,7 @@ function App() {
                     type="text"
                     value={metadata.lesson}
                     onChange={(e) => updateLessonMetadata({ lesson: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter lesson"
                   />
                 </div>
@@ -528,7 +574,7 @@ function App() {
                     type="text"
                     value={metadata.title}
                     onChange={(e) => updateCustomMetadata({ title: e.target.value })}
-                    className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter quiz title"
                   />
                 </div>
@@ -552,7 +598,7 @@ function App() {
                           type="text"
                           value={metadata.module}
                           onChange={(e) => updateCustomMetadata({ module: e.target.value })}
-                          className="w-full px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50/50 dark:bg-gray-700"
+                          className="w-full px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-purple-500 bg-gray-50/50 dark:bg-gray-700"
                           placeholder="Enter module name if applicable"
                         />
                       </div>
@@ -584,7 +630,7 @@ function App() {
                           <input
                             type="text"
                             placeholder="Add tags (press Enter)"
-                            className="w-full px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50/50 dark:bg-gray-700"
+                            className="w-full px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-purple-500 bg-gray-50/50 dark:bg-gray-700"
                             onKeyPress={(e) => {
                               if (e.key === 'Enter') {
                                 const input = e.target as HTMLInputElement;
@@ -606,47 +652,56 @@ function App() {
 
           {/* Questions Section */}
           <div className="space-y-6">
-            {questions.map((question, index) => (
-              <div
-                key={index}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6"
-              >
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 font-semibold">
-                      {question.sn}
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">Question {question.sn}</h3>
-                  </div>
-                  <button
-                    onClick={() => removeQuestion(index)}
-                    className="p-2 text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
-                    aria-label="Remove question"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
+            <div className="flex items-center space-x-3">
+              <ListChecks className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Questions</h2>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+            </div>
 
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {questions.map((question, index) => (
+              <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 font-semibold">
+                        {question.sn}
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Question {question.sn}</h3>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => removeQuestion(index)}
+                        className="p-1.5 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                        title="Remove question"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Source</label>
+                      <label className="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <Tag className="w-4 h-4" />
+                        <span>Source</span>
+                      </label>
                       <input
                         type="text"
                         value={question.source}
                         onChange={(e) => updateQuestion(index, { source: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                         placeholder="Enter question source"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Correct Answer
+                      <label className="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <Bookmark className="w-4 h-4" />
+                        <span>Correct Answer</span>
                       </label>
                       <select
                         value={question.answer}
                         onChange={(e) => updateQuestion(index, { answer: e.target.value as Option })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                       >
                         <option value="">Select correct answer</option>
                         {getAvailableOptions(index).map((opt) => (
@@ -658,12 +713,15 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Question Text</label>
+                  <div className="space-y-2 mb-6">
+                    <label className="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <FileQuestion className="w-4 h-4" />
+                      <span>Question</span>
+                    </label>
                     <textarea
                       value={question.question}
                       onChange={(e) => updateQuestion(index, { question: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                       rows={3}
                       placeholder="Enter your question"
                     />
@@ -671,55 +729,43 @@ function App() {
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Options</label>
-                      <div className="relative group">
-                        <button
-                          onClick={() => addExtraOption(index)}
-                          disabled={extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))}
-                          className={`flex items-center space-x-1 text-sm font-medium
-                            ${extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))
-                              ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                              : 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300'}`}
-                        >
-                          <PlusCircle className="w-4 h-4" />
-                          <span>Add Option</span>
-                        </button>
-                        {(extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))) && (
-                          <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700 p-3 hidden group-hover:block z-10">
-                            <div className="text-sm text-gray-600 dark:text-gray-300">
-                              {extraOptionsCount[index] >= EXTRA_OPTIONS.length ? (
-                                <span>Maximum number of options (7) reached</span>
-                              ) : !areOptionsFilledInSequence(questions[index], getAvailableOptions(index)) ? (
-                                <span>Please fill in existing options in sequence before adding more</span>
-                              ) : null}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Answer Options</h4>
+                      <button
+                        onClick={() => addExtraOption(index)}
+                        disabled={extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))}
+                        className={`flex items-center space-x-1 text-xs p-1.5 rounded-lg transition-colors
+                          ${extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))
+                            ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                            : 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20'}`}
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span>Add Option</span>
+                      </button>
                     </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {getAvailableOptions(index).map((opt) => (
                         <div key={opt} className="relative">
+                          <div className="absolute left-3 top-2.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded text-xs font-medium">
+                            {opt.toUpperCase()}
+                          </div>
                           <input
                             type="text"
                             value={question[opt]}
                             onChange={(e) => updateQuestion(index, { [opt]: e.target.value })}
-                            className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                            className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500
                               ${question.answer === opt
-                                ? 'border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20'
+                                ? 'border-purple-500 bg-purple-50 dark:border-purple-600 dark:bg-purple-900/20'
                                 : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700'} dark:text-white`}
                             placeholder={`Option ${opt.toUpperCase()}`}
                           />
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {opt.toUpperCase()}.
-                          </span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {!isQuestionValid(question) && (
-                    <div className="flex items-start space-x-2 text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
+                    <div className="flex items-start space-x-2 mt-6 text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg">
                       <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                       <p className="text-sm">{getQuestionValidationMessage(question)}</p>
                     </div>
@@ -730,7 +776,7 @@ function App() {
 
             <button
               onClick={addQuestion}
-              className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-500 transition-colors flex items-center justify-center space-x-2"
+              className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-500 transition-colors flex items-center justify-center space-x-2 hover:bg-purple-50/30 dark:hover:bg-purple-900/10"
             >
               <PlusCircle className="w-5 h-5" />
               <span className="font-medium">Add New Question</span>
@@ -741,8 +787,8 @@ function App() {
 
       {/* Help Modal */}
       {showHelp && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto animate-modal">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Help Guide</h2>
@@ -753,7 +799,7 @@ function App() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="prose prose-indigo dark:prose-invert max-w-none">
+              <div className="prose prose-purple dark:prose-invert max-w-none">
                 <h3>Creating a Quiz</h3>
                 <p>
                   Start by selecting either Lesson or Custom quiz type. Fill in all required metadata
@@ -778,6 +824,18 @@ function App() {
                 <p>
                   Once all questions are valid and complete, click the Export JSON button to download
                   your quiz.
+                </p>
+                <h3>Creating PDF Quizzes with Quizst</h3>
+                <p>
+                  The JSON output from Zagazoga Quiz Creator is fully compatible with <a href="https://github.com/MuhammadAly11/Quizst" target="_blank" rel="noopener noreferrer" className="hover:underline">Quizst</a>, a Typst template for creating professional MCQ exam papers.
+                </p>
+                <p>To create PDF quizzes with Quizst:</p>
+                <ol>
+                  <li>Export your quiz from this app as JSON</li>
+                  <li>Use the JSON with Quizst to generate beautifully formatted PDF documents</li>
+                </ol>
+                <p>
+                  Visit the <a href="https://github.com/MuhammadAly11/Quizst" target="_blank" rel="noopener noreferrer" className="hover:underline">Quizst GitHub repository</a> for detailed instructions.
                 </p>
               </div>
             </div>
