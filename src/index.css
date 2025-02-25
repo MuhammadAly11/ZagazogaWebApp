@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Navy Color Palette */
+  --navy-50: rgb(240, 245, 252);
+  --navy-100: rgb(224, 234, 246);
+  --navy-200: rgb(195, 215, 238);
+  --navy-300: rgb(156, 184, 218);
+  --navy-400: rgb(115, 151, 195);
+  --navy-500: rgb(86, 124, 173);
+  --navy-600: rgb(61, 97, 146);
+  --navy-700: rgb(43, 74, 117);
+  --navy-800: rgb(32, 54, 86);
+  --navy-900: rgb(20, 34, 54);
+  --navy-950: rgb(10, 18, 30);
+  
+  /* Secondary Orange Color Palette */
+  --orange-50: rgb(255, 247, 237);
+  --orange-100: rgb(255, 237, 213);
+  --orange-200: rgb(254, 215, 170);
+  --orange-300: rgb(253, 186, 116);
+  --orange-400: rgb(251, 146, 60);
+  --orange-500: rgb(249, 115, 22);
+  --orange-600: rgb(234, 88, 12);
+  --orange-700: rgb(194, 65, 12);
+  --orange-800: rgb(154, 52, 18);
+  --orange-900: rgb(124, 45, 18);
+  --orange-950: rgb(67, 20, 7);
+}
+
+/* Base styles */
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+  }
+  
+  body {
+    @apply text-gray-900 dark:text-white bg-gray-50 dark:bg-navy-900;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-navy-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-navy-600 rounded-full hover:bg-gray-400 dark:hover:bg-navy-500 transition-colors;
+  }
+  
+  /* Fixed mobile bottom nav padding */
+  @media (max-width: 768px) {
+    main {
+      padding-bottom: 5rem;
+    }
+  }
+}
+
+/* Animations */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.4s ease-out forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+  
+  .animate-bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    70% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  /* Focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-navy-900;
+  }
+}
+
+/* Custom components */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus-ring;
+  }
+  
+  .btn-primary {
+    @apply bg-orange-500 text-white hover:bg-orange-600 shadow-sm;
+  }
+  
+  .btn-secondary {
+    @apply bg-navy-600 text-white hover:bg-navy-700 shadow-sm;
+  }
+  
+  .btn-outline {
+    @apply border border-navy-300 dark:border-navy-600 text-navy-700 dark:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-800;
+  }
+  
+  .btn-ghost {
+    @apply text-navy-600 dark:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-800;
+  }
+  
+  .input {
+    @apply px-3 py-2 text-base border border-gray-300 dark:border-navy-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-navy-700 dark:text-white;
+  }
+  
+  .textarea {
+    @apply px-3 py-2 text-base border border-gray-300 dark:border-navy-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-navy-700 dark:text-white resize-none;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-navy-800 rounded-xl shadow-md border border-gray-200 dark:border-navy-700 overflow-hidden;
+  }
+  
+  .card-header {
+    @apply px-5 py-4 border-b border-gray-200 dark:border-navy-700;
+  }
+  
+  .card-body {
+    @apply p-5;
+  }
+  
+  .mobile-tab {
+    @apply flex flex-col items-center justify-center gap-1 py-1 px-3 text-xs font-medium rounded-lg transition-colors;
+  }
+  
+  .mobile-tab-active {
+    @apply text-orange-500;
+  }
+  
+  .mobile-tab-inactive {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+  
+  /* Question pagination */
+  .question-pagination {
+    @apply flex items-center justify-between px-4 py-2 bg-white dark:bg-navy-800 rounded-lg shadow border border-gray-200 dark:border-navy-700;
+  }
+  
+  .pagination-button {
+    @apply p-2 rounded-md text-navy-600 dark:text-navy-300 hover:bg-navy-50 dark:hover:bg-navy-700 transition-colors;
+  }
+  
+  .question-card {
+    @apply bg-white dark:bg-navy-800 rounded-xl shadow-lg overflow-hidden animate-fade-in border border-gray-200 dark:border-navy-700;
+  }
+} 
