@@ -533,33 +533,66 @@ function App() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Module</label>
-                  <input
-                    type="text"
-                    value={metadata.module}
-                    onChange={(e) => updateLessonMetadata({ module: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter module name"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={metadata.module}
+                      onChange={(e) => updateLessonMetadata({ module: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Enter module"
+                    />
+                    {metadata.type === 'lesson' && metadata.module && (
+                      <button
+                        onClick={() => updateLessonMetadata({ module: '' })}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        title="Clear module"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
-                  <input
-                    type="text"
-                    value={metadata.subject}
-                    onChange={(e) => updateLessonMetadata({ subject: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter subject"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={metadata.subject}
+                      onChange={(e) => updateLessonMetadata({ subject: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Enter subject"
+                    />
+                    {metadata.type === 'lesson' && metadata.subject && (
+                      <button
+                        onClick={() => updateLessonMetadata({ subject: '' })}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        title="Clear subject"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Lesson</label>
-                  <input
-                    type="text"
-                    value={metadata.lesson}
-                    onChange={(e) => updateLessonMetadata({ lesson: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter lesson"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={metadata.lesson}
+                      onChange={(e) => updateLessonMetadata({ lesson: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Enter lesson"
+                    />
+                    {metadata.type === 'lesson' && metadata.lesson && (
+                      <button
+                        onClick={() => updateLessonMetadata({ lesson: '' })}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        title="Clear lesson"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -570,13 +603,24 @@ function App() {
                     Title
                     <span className="text-red-500 dark:text-red-400 ml-1">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={metadata.title}
-                    onChange={(e) => updateCustomMetadata({ title: e.target.value })}
-                    className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter quiz title"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={metadata.title}
+                      onChange={(e) => updateCustomMetadata({ title: e.target.value })}
+                      className="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Enter quiz title"
+                    />
+                    {metadata.type === 'custom' && metadata.title && (
+                      <button
+                        onClick={() => updateCustomMetadata({ title: '' })}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        title="Clear title"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Optional Fields - More Compact */}
@@ -594,13 +638,24 @@ function App() {
                         <label className="block text-xs font-medium text-gray-400 dark:text-gray-500 mb-1">
                           Module
                         </label>
-                        <input
-                          type="text"
-                          value={metadata.module}
-                          onChange={(e) => updateCustomMetadata({ module: e.target.value })}
-                          className="w-full px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-purple-500 bg-gray-50/50 dark:bg-gray-700"
-                          placeholder="Enter module name if applicable"
-                        />
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={metadata.module}
+                            onChange={(e) => updateCustomMetadata({ module: e.target.value })}
+                            className="w-full px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-purple-500 bg-gray-50/50 dark:bg-gray-700"
+                            placeholder="Enter module name if applicable"
+                          />
+                          {metadata.type === 'custom' && metadata.module && (
+                            <button
+                              onClick={() => updateCustomMetadata({ module: '' })}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                              title="Clear module"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Tags Field */}
@@ -682,16 +737,29 @@ function App() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-2">
                       <label className="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <Tag className="w-4 h-4" />
-                        <span>Source</span>
+                        <span className="flex items-center space-x-1">
+                          <Layout className="w-4 h-4" />
+                          <span>Source</span>
+                        </span>
                       </label>
-                      <input
-                        type="text"
-                        value={question.source}
-                        onChange={(e) => updateQuestion(index, { source: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                        placeholder="Enter question source"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={question.source}
+                          onChange={(e) => updateQuestion(index, { source: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                          placeholder="Enter source"
+                        />
+                        {question.source && (
+                          <button
+                            onClick={() => updateQuestion(index, { source: '' })}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                            title="Clear source"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -718,13 +786,24 @@ function App() {
                       <FileQuestion className="w-4 h-4" />
                       <span>Question</span>
                     </label>
-                    <textarea
-                      value={question.question}
-                      onChange={(e) => updateQuestion(index, { question: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                      rows={3}
-                      placeholder="Enter your question"
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={question.question}
+                        onChange={(e) => updateQuestion(index, { question: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                        rows={3}
+                        placeholder="Enter your question"
+                      />
+                      {question.question && (
+                        <button
+                          onClick={() => updateQuestion(index, { question: '' })}
+                          className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                          title="Clear question"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -737,6 +816,11 @@ function App() {
                           ${extraOptionsCount[index] >= EXTRA_OPTIONS.length || !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))
                             ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                             : 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20'}`}
+                        title={extraOptionsCount[index] >= EXTRA_OPTIONS.length 
+                          ? "Maximum number of options reached" 
+                          : !areOptionsFilledInSequence(questions[index], getAvailableOptions(index))
+                          ? "Fill existing options in sequence before adding more"
+                          : "Add another answer option"}
                       >
                         <PlusCircle className="w-4 h-4" />
                         <span>Add Option</span>
@@ -753,12 +837,21 @@ function App() {
                             type="text"
                             value={question[opt]}
                             onChange={(e) => updateQuestion(index, { [opt]: e.target.value })}
-                            className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500
+                            className={`w-full pl-8 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500
                               ${question.answer === opt
                                 ? 'border-purple-500 bg-purple-50 dark:border-purple-600 dark:bg-purple-900/20'
                                 : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700'} dark:text-white`}
                             placeholder={`Option ${opt.toUpperCase()}`}
                           />
+                          {question[opt] && (
+                            <button
+                              onClick={() => updateQuestion(index, { [opt]: '' })}
+                              className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                              title="Clear input"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
