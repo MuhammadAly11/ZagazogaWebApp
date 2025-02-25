@@ -5,7 +5,6 @@
 @layer base {
   html {
     font-family: Inter, system-ui, -apple-system, sans-serif;
-    scroll-behavior: smooth;
   }
 
   body {
@@ -13,57 +12,21 @@
   }
 
   input, textarea, select {
-    @apply border-gray-200 rounded-xl shadow-sm transition-all duration-300 bg-white/70 backdrop-blur-sm;
+    @apply border-gray-200 rounded-xl shadow-sm transition-all duration-300;
   }
   
   input:focus, textarea:focus, select:focus {
-    @apply border-purple-500 ring-1 ring-purple-500 bg-white shadow-lg;
+    @apply border-purple-500 ring-1 ring-purple-500 bg-white;
   }
 
   input::placeholder, textarea::placeholder {
     @apply text-gray-400;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight;
-  }
 }
 
 @layer components {
-  .animate-modal {
-    animation: modal-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
   .animate-fade-in {
     animation: fade-in 0.2s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  .animate-pulse-once {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 1;
-  }
-
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg transition-all duration-300;
-  }
-
-  .glass-card:hover {
-    @apply shadow-xl bg-white/90;
-  }
-
-  .btn-primary {
-    @apply px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-300 shadow-md hover:shadow-lg active:shadow-sm;
-  }
-
-  .btn-secondary {
-    @apply px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 hover:text-purple-600 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md;
-  }
-
-  .tag {
-    @apply inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm transition-all duration-300 hover:bg-purple-100;
   }
 
   .prose h3 {
@@ -82,19 +45,8 @@
     @apply mb-2;
   }
   
-  .prose strong {
-    @apply text-purple-600 dark:text-purple-400 font-semibold;
-  }
-}
-
-@keyframes modal-slide {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+  .prose ol {
+    @apply list-decimal list-inside text-gray-600 dark:text-gray-300 mb-4;
   }
 }
 
@@ -104,25 +56,5 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
   }
 }
